@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityCare | Tamil Nadu Smart Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; }
+
+        /* WINDOW 1: RANDOM ANIMATED HERO */
+        .window-1 {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #heroBg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: brightness(0.6);
+            animation: slowZoom 20s infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+
+        .hero-box h1 { font-size: 3.8rem; font-weight: 700; margin-bottom: 15px; }
+        .hero-box p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; opacity: 0.9; }
+
+        .btn-scroll {
+            background: #2600ff; color: white; padding: 15px 40px;
+            border-radius: 50px; text-decoration: none; font-weight: 600;
+            transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .btn-scroll:hover { background: white; color: #2600ff; transform: translateY(-5px); }
+
+        /* WINDOW 2: SELECTION (PASTEL CONTRAST) */
+        .window-2 {
+            min-height: 100vh;
+            background-color: #fafafa;
+            padding: 80px 20px;
+        }
+
+        .content-wrap { max-width: 1100px; margin: 0 auto; }
+
+        /* About Section in Window 2 */
+        .about-grid {
+            display: flex; align-items: center; gap: 40px; margin-bottom: 80px;
+            background: #fff; padding: 30px; border-radius: 30px;
+        }
+        .about-grid img { width: 45%; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .about-text h2 { font-size: 2rem; color: #1e293b; margin-bottom: 15px; }
+        .about-text p { color: #64748b; line-height: 1.6; }
+
+        /* Pastel Option Cards */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .option-card {
+            padding: 40px 20px; border-radius: 25px; text-align: center;
+            text-decoration: none; transition: 0.4s; position: relative;
+            overflow: hidden; border: 2px solid transparent;
+        }
+
+        .option-card:hover { transform: translateY(-12px); border-color: #2600ff; }
+        .option-card i { font-size: 45px; margin-bottom: 15px; }
+        .option-card span { display: block; font-weight: 700; font-size: 1.3rem; }
+
+        /* Pastel Color Combinations */
+        .pothole { background: #ffe4e6; color: #9f1239; } /* Pastel Rose */
+        .garbage { background: #ecfdf5; color: #065f46; } /* Pastel Mint */
+        .light { background: #fefce8; color: #854d0e; }   /* Pastel Yellow */
+        .drainage { background: #eff6ff; color: #1e40af; } /* Pastel Blue */
+
+    </style>
+</head>
+<body>
+
+    <!-- WINDOW 1 -->
+    <div class="window-1">
+        <div id="heroBg"></div>
+        <div class="hero-box">
+            <h1>Tamil Nadu Smart Connect</h1>
+            <p>Your direct line to municipal excellence. Experience seamless civic reporting with live GPS tracking.</p>
+            <a href="#selection" class="btn-scroll">Start Reporting</a>
+        </div>
+    </div>
+
+    <!-- WINDOW 2 -->
+    <div class="window-2" id="selection">
+        <div class="content-wrap">
+            <div class="about-grid">
+                <img src="https://images.unsplash.com/photo-1570126618953-d437176e8c79?auto=format&fit=crop&q=80&w=800" alt="City Support">
+                <div class="about-text">
+                    <h2>Improve Your Neighborhood</h2>
+                    <p>By reporting issues like potholes or broken lights, you help the Tamil Nadu municipal corporation prioritize repairs where they are needed most. Our automated system ensures your voice reaches the right department instantly.</p>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <a href="report.html?type=Pothole" class="option-card pothole">
+                    <i class="fa-solid fa-road"></i>
+                    <span>Potholes</span>
+                </a>
+                <a href="report.html?type=Garbage" class="option-card garbage">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Garbage</span>
+                </a>
+                <a href="report.html?type=Street Light" class="option-card light">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>Street Light</span>
+                </a>
+                <a href="report.html?type=Drainage" class="option-card drainage">
+                    <i class="fa-solid fa-droplet"></i>
+                    <span>Drainage</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Random Image Engine for Hero Background
+        const cityImages = [
+            'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2000',
+            'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000',
+            'https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2000',
+            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=2000'
+        ];
+        document.getElementById('heroBg').style.backgroundImage = `url('${cityImages[Math.floor(Math.random() * cityImages.length)]}')`;
+    </script>
+</body>
+</html>
