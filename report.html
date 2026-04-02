@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #fdf2f8; display: flex; justify-content: center; padding: 30px; }
+
+        .report-window { 
+            max-width: 600px; width: 100%; background: white; 
+            padding: 40px; border-radius: 30px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            animation: slideUp 0.7s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .badge { background: #2600ff; color: white; padding: 6px 18px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: 600; }
+        
+        .form-group { margin-bottom: 25px; position: relative; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; color: #334155; }
+        
+        input, textarea { width: 100%; padding: 15px; border: 2px solid #f1f5f9; border-radius: 15px; background: #f8fafc; transition: 0.3s; }
+        input:focus { border-color: #2600ff; outline: none; background: #fff; }
+
+        .gps-btn { 
+            background: #0ea5e9; color: white; border: none; padding: 12px 20px; 
+            border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            margin-bottom: 15px; font-weight: 600; transition: 0.3s;
+        }
+        .gps-btn:hover { background: #0284c7; }
+
+        /* High Accuracy Suggestions */
+        .sug-box {
+            position: absolute; width: 100%; background: white; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; max-height: 250px;
+            overflow-y: auto; display: none; margin-top: 5px;
+        }
+        .sug-box div { padding: 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .sug-box div:hover { background: #f0f9ff; color: #2600ff; }
+
+        .btn-submit { width: 100%; padding: 18px; background: #2600ff; color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="report-window">
+    <div class="badge" id="categoryName">Issue Type</div>
+    <h2>Location & Details</h2>
+    <p style="color: #64748b; margin-bottom: 30px;">Enter your details to file an official report.</p>
+
+    <button class="gps-btn" onclick="getPreciseLocation()">
+        <i class="fa-solid fa-location-arrow"></i> Detect My Live Location
+    </button>
+
+    <div class="form-group">
+        <label>Search Street/Area in Tamil Nadu</label>
+        <input type="text" id="locSearch" placeholder="Start typing (e.g. T.Nagar, Madurai...)" oninput="searchTN(this.value)">
+        <div class="sug-box" id="sugBox"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Description of Issue</label>
+        <textarea rows="4" placeholder="Describe what you see..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="alert('Submission Complete!')">Submit Official Report</button>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById('categoryName').innerText = urlParams.get('type') || "Civic Issue";
+
+    // 1. HIGH ACCURACY GPS
+    function getPreciseLocation() {
+        const inp = document.getElementById('locSearch');
+        inp.placeholder = "Locating you precisely...";
+        
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            // High accuracy reverse geocoding
+            const res = await fetch("https://audriana-ungesticular-tonically.ngrok-free.dev/report",{
+            const data = await res.json();
+            inp.value = data.display_name;
+            inp.placeholder = "Start typing area name...";
+        });
+    }
+
+    // 2. ACCURATE TAMIL NADU SUGGESTIONS
+    async function searchTN(val) {
+        const box = document.getElementById('sugBox');
+        if(val.length < 3) { box.style.display = 'none'; return; }
+
+        // Fetching with "bounded" parameter to force Tamil Nadu results
+        const url = `https://nominatim.openstreetmap.org/search?q=${val}, Tamil Nadu&format=json&limit=6&addressdetails=1&countrycodes=in`;
+        
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            box.innerHTML = '';
+            if(data.length > 0) {
+                box.style.display = 'block';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    // Cleaner display: Street, City
+                    div.innerText = item.display_name;
+                    div.onclick = () => {
+                        document.getElementById('locSearch').value = item.display_name;
+                        box.style.display = 'none';
+                    };
+                    box.appendChild(div);
+                });
+            }
+        } catch (e) { console.log("Search error"); }
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if(e.target.id !== 'locSearch') document.getElementById('sugBox').style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
