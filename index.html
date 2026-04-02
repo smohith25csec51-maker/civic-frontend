@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CivicPulse</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    color:white;
+}
+.screen { display:none; padding:20px; }
+.active { display:block; }
+.grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-top:30px;
+}
+.circle {
+    background:rgba(255,255,255,0.1);
+    border-radius:15px;
+    padding:20px;
+    text-align:center;
+    cursor:pointer;
+    transition:0.3s;
+}
+.circle:hover {
+    transform:scale(1.05);
+    background:rgba(255,255,255,0.2);
+}
+.icon { font-size:30px; }
+input, button {
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+}
+button { background:#00c6ff; color:white; }
+#preview {
+    width:100%;
+    border-radius:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="screen1" class="screen active">
+<h2>Select Issue Type</h2>
+
+<div class="grid">
+<div class="circle" onclick="selectIssue('Pothole')">
+<div class="icon">🚧</div>Pothole</div>
+
+<div class="circle" onclick="selectIssue('Garbage')">
+<div class="icon">🗑</div>Garbage</div>
+
+<div class="circle" onclick="selectIssue('Streetlight')">
+<div class="icon">💡</div>Streetlight</div>
+
+<div class="circle" onclick="selectIssue('Drain')">
+<div class="icon">🚿</div>Drain</div>
+</div>
+</div>
+
+<div id="screen2" class="screen">
+<h2 id="selectedType"></h2>
+
+<button onclick="openCamera()">📸 Capture Photo</button>
+<input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="previewImage(event)">
+
+<img id="preview">
+
+<input id="location" placeholder="Location">
+<button onclick="getLocation()">📍 Use Location</button>
+
+<input id="desc" placeholder="Description">
+
+<button onclick="submitIssue()">Submit Issue</button>
+<button onclick="back()">⬅ Back</button>
+</div>
+
+<script>
+
+let issueType="";
+let imageData="";
+
+function selectIssue(type){
+    issueType=type;
+    document.getElementById("selectedType").innerText=type;
+    showScreen(2);
+}
+
+function showScreen(n){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById("screen"+n).classList.add("active");
+}
+
+function back(){
+    showScreen(1);
+}
+
+function openCamera(){
+    document.getElementById("cameraInput").click();
+}
+
+function previewImage(event){
+    let file=event.target.files[0];
+    let reader=new FileReader();
+    reader.onload=function(){
+        imageData=reader.result;
+        document.getElementById("preview").src=imageData;
+    }
+    reader.readAsDataURL(file);
+}
+
+function getLocation(){
+    navigator.geolocation.getCurrentPosition(async pos=>{
+        let lat=pos.coords.latitude;
+        let lon=pos.coords.longitude;
+
+        let res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        let data=await res.json();
+
+        document.getElementById("location").value=data.display_name;
+    });
+}
+
+function submitIssue(){
+    fetch("https://audriana-ungesticular-tonically.ngrok-free.dev/report",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            type:issueType,
+            location:location.value,
+            description:desc.value,
+            priority:"High",
+            image:imageData
+        })
+    }).then(()=>{
+        alert("✅ Issue Submitted");
+        showScreen(1);
+    });
+}
+
+</script>
+
+</body>
+</html>
