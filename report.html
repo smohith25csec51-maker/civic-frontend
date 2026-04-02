@@ -1,0 +1,78 @@
+<script>
+    window.addEventListener('load', () => {
+        const tg = document.getElementById('titleGroup'), h = document.getElementById('hammerIcon'), 
+              b = document.getElementById('boltIcon'), w = document.getElementById('waterWave'),
+              c = document.getElementById('heroContent'), bd = document.getElementById('body');
+    
+        setTimeout(() => { h.style.animation = "hammerStrike 0.8s forwards"; }, 600);
+        setTimeout(() => { bd.classList.add('shake'); tg.classList.add('snap-fix'); }, 1000);
+        setTimeout(() => { b.style.animation = "boltZap 0.7s forwards"; tg.classList.add('brighten'); }, 1800);
+        setTimeout(() => { w.style.animation = "waveSlide 1.2s forwards"; }, 2600);
+        setTimeout(() => { tg.classList.add('clean'); c.style.opacity = "1"; c.style.transform = "translateY(0)"; }, 3200);
+    });
+    
+    const API = "https://audriana-ungesticular-tonically.ngrok-free.dev";
+    
+    let map;
+    
+    function activateMap() {
+        document.getElementById('mapSection').style.display = "block";
+    
+        if (!map) {
+            map = L.map('map').setView([13.0827, 80.2707], 13);
+    
+            // ✅ FIXED TILE (no 403 error)
+            L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+    
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+    
+                map.setView([lat, lng], 13);
+    
+                L.marker([lat, lng]).addTo(map).bindPopup("You are here");
+    
+                L.circle([lat, lng], {
+                    radius: 10000,
+                    color: '#00f2ff',
+                    fillOpacity: 0.1
+                }).addTo(map);
+    
+                // 🔥 FETCH REAL DATA
+                fetch(API + "/issues")
+                .then(res => res.json())
+                .then(data => {
+    
+                    data.forEach(issue => {
+    
+                        if(issue.lat && issue.lng){
+    
+                            let color = issue.status === "Resolved" ? "#22c55e" : "#ef4444";
+    
+                            L.circleMarker([issue.lat, issue.lng], {
+                                radius: 7,
+                                fillColor: color,
+                                color: "#fff",
+                                weight: 1,
+                                fillOpacity: 1
+                            })
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="color:#000;">
+                                    <b>${issue.type}</b><br>
+                                    ${issue.description}<br>
+                                    Status: ${issue.status}
+                                </div>
+                            `);
+                        }
+    
+                    });
+    
+                });
+    
+            });
+        }
+    }
+    </script>

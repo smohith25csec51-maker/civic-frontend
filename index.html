@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Fix My City</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#05070a;
+--card:#1e293b;
+--accent:#00f2ff;
+--text-dim:#94a3b8;
+--green:#22c55e;
+--orange:#f59e0b;
+--red:#ef4444;
+}
+
+body{
+background:var(--bg);
+color:white;
+font-family:'Poppins',sans-serif;
+padding:20px;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+font-family:'Russo One',sans-serif;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.card{
+background:var(--card);
+padding:20px;
+border-radius:20px;
+margin-bottom:15px;
+border:1px solid #334155;
+transition:0.3s;
+}
+
+.card:hover{
+transform:scale(1.02);
+}
+
+.title{
+font-weight:700;
+font-size:1.2rem;
+color:var(--accent);
+}
+
+.desc{
+margin:8px 0;
+color:var(--text-dim);
+}
+
+.meta{
+font-size:0.8rem;
+color:var(--text-dim);
+margin-bottom:10px;
+}
+
+.status{
+font-weight:600;
+margin-bottom:10px;
+}
+
+.badge{
+padding:4px 10px;
+border-radius:8px;
+font-size:0.75rem;
+margin-left:5px;
+}
+
+.pending{background:var(--red);}
+.progress-badge{background:var(--orange);}
+.done{background:var(--green);}
+
+.btn{
+padding:8px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin-right:8px;
+font-size:0.8rem;
+}
+
+.progress{
+background:var(--orange);
+color:black;
+}
+
+.resolve{
+background:var(--green);
+color:black;
+}
+
+img{
+width:100%;
+border-radius:10px;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>⚙ Admin Dashboard</h1>
+
+<div class="container" id="issues"></div>
+
+<script>
+
+// ✅ YOUR REAL NGROK LINK
+const API = "https://audriana-ungesticular-tonically.ngrok-free.dev";
+
+function loadIssues(){
+
+fetch(API + "/issues")
+.then(res=>res.json())
+.then(data=>{
+
+let html="";
+
+if(data.length===0){
+html="<p style='text-align:center;color:#94a3b8;'>No issues yet</p>";
+}
+
+data.reverse().forEach(i=>{
+
+let statusClass = "pending";
+if(i.status==="In Progress") statusClass="progress-badge";
+if(i.status==="Resolved") statusClass="done";
+
+html+=`
+<div class="card">
+
+<div class="title">${i.type}</div>
+
+<div class="desc">${i.description}</div>
+
+<div class="meta">
+📍 ${i.location}<br>
+⏱ ${i.time}<br>
+🔥 Priority: ${i.priority || "High"}
+</div>
+
+<div class="status">
+Status: <span class="badge ${statusClass}">${i.status}</span>
+</div>
+
+${i.image ? `<img src="${i.image}">` : ""}
+
+<button class="btn progress" onclick="update(${i.id},'In Progress')">In Progress</button>
+<button class="btn resolve" onclick="update(${i.id},'Resolved')">Resolved</button>
+
+</div>
+`;
+});
+
+document.getElementById("issues").innerHTML=html;
+
+})
+.catch(()=>{
+document.getElementById("issues").innerHTML=
+"<p style='text-align:center;color:red;'>⚠ Backend not reachable</p>";
+});
+
+}
+
+// UPDATE STATUS
+function update(id,status){
+
+fetch(`${API}/update/${id}`,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({status:status})
+})
+.then(()=>loadIssues());
+
+}
+
+// 🔥 AUTO REFRESH EVERY 5 SECONDS
+setInterval(loadIssues,5000);
+
+// FIRST LOAD
+loadIssues();
+
+</script>
+
+</body>
+</html>
